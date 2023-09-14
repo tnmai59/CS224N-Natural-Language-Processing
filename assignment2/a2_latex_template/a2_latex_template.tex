@@ -1,4 +1,4 @@
-    \documentclass{article}
+\documentclass{article}
 
 \newif\ifanswers
 \answerstrue % comment out to hide answers
@@ -184,9 +184,16 @@ Prove that the naive-softmax loss (Equation \ref{naive-softmax}) is the same as 
 -\sum_{w \in \text{Vocab}} \bm y_w \log(\hat{\bm y}_w) = - \log (\hat{\bm y}_o).
 \end{equation}
 
-Your answer should be one line. You may describe your answer in words.
+Your answer should be one line. You may describe your answer in word
 \begin{shaded}
 \begin{answer}
+
+    y is one-hot vector  with a 1 for the true outside word o, and 0 everywhere else. Thus, the summation of all other terms will be zero.
+
+    Therefore, 
+    \begin{equation*}
+        -\sum_{w \in \text{Vocab}} \bm y_w \log(\hat{\bm y}_w) = - \log (\hat{\bm y}_o).
+    \end{equation*}
 
 \end{answer}
 \end{shaded}
@@ -214,6 +221,15 @@ Hint: Consider the case where $\mathbf{u}_x = \alpha\mathbf{u}_y$ for some words
 \begin{shaded}
 \begin{answer}
 
+From (1) and (2):
+    \begin{align*}
+        \frac{\partial}{\partial v_c} J_{naive-softmax}(v_c, o, U) &= \frac{\partial}{\partial v_c} -\log\left(\frac{\exp(\bm u_{o}^\top \bm v_c)}{\sum_{w \in \text{Vocab}} \exp(\bm u_{w}^\top \bm v_c)}\right)\\
+        &= -\frac{\partial}{\partial v_c} \log\left(\exp(\bm u_o^T\bm v_c)\right) + \frac{\partial}{\partial v_c} \log\left(\sum_{w \in \text{Vocab}} \exp(\bm u_{w}^\top \bm v_c)\right)\\
+        &= -u_o + \sum_{w \in \text{Vocab}}\frac{\exp(\bm u_{w}^\top \bm v_c)u_w}{\sum_{w \in \text{Vocab}} \exp(\bm u_{w}^\top \bm v_c)}\\
+        & = - u_o + \sum_{w\in V}p(O=w|C=c)u_w\\
+        & = -u_o + \sum_{w\in V}\hat{y_w}u_w\\
+        & = U(\hat{y} - y)
+    \end{align*}
 \end{answer}
 \end{shaded}
 
@@ -223,6 +239,22 @@ Hint: Consider the case where $\mathbf{u}_x = \alpha\mathbf{u}_y$ for some words
 \begin{shaded}
 \begin{answer}
 
+Have:
+    \begin{align*}
+    \frac{\partial J(v_c,o,U)}{\partial u_w} &= - \frac{\partial}{\partial u_w}\left(u_o^Tv_c - \log{\sum_{w\in V}}\exp(u_w^Tv_c) \right)\\
+    &= - \frac{\partial(u_o^Tv_c)}{\partial u_w} + \frac{\partial(\log(\sum_{w\in V}\exp(u_w^Tv_c)))}{\partial u_w}
+    \end{align*}
+when $w \neq o$:
+    \begin{align*}
+        \frac{\partial J(v_c,o,U)}{\partial u_w} &= 0 +p(O=w|C=c)v_c\\
+&=\hat{y}_wv_c
+    \end{align*}
+when $w = o$:
+    \begin{align*}
+        \frac{\partial J(v_c,o,U)}{\partial u_w} &= -v_c +p(O=w|C=c)v_c\\
+    &= \hat{y}_wv_c - v_c\\
+    &=(\hat{y}_w -1 )v_c
+    \end{align*}
 \end{answer}
 \end{shaded}
 
@@ -231,7 +263,10 @@ Hint: Consider the case where $\mathbf{u}_x = \alpha\mathbf{u}_y$ for some words
 
 \begin{shaded}
 \begin{answer}
-
+Combine b and c, knowing y is one hot vector:
+    \begin{align*}
+       \frac{\partial \bm J(\bm v_c, o, \bm U)}{\partial \bm U} =  \frac{\partial J(v_c,o,U)}{\partial U} = v_c(\hat{y} - y)^T
+    \end{align*}
 \end{answer}
 \end{shaded}
 
